@@ -1,6 +1,6 @@
 from os import getenv
 from dotenv import load_dotenv
-from interactions import Client, Intents, listen, slash_command, SlashContext, ComponentContext, component_callback
+from interactions import Client, Intents, listen, ComponentContext, component_callback
 from interactions.api.events import CommandError, MemberUpdate
 from functions import create_resolve_guest_buttons, create_action_rows_horizontally
 import traceback
@@ -113,20 +113,6 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
             case _:
                 raise Exception(f"No option was selected for resolving {name}'s Guest role.")
             
-
-# Slash Commands
-@slash_command(name="hello", description="Says Hello", scopes=SCOPES)
-async def hello(ctx: SlashContext):
-    await ctx.send("Hello!")
-
-@slash_command(name="give_guest_role", description="Gives the Guest role", scopes=SCOPES)
-async def give_guest_role(ctx: SlashContext):
-    if not ctx.member.has_role(guest_role):
-        await ctx.member.add_role(role=guest_role)
-        await ctx.send("You now have the guest role.")
-    else:
-        await ctx.member.remove_role(role=guest_role)
-        await ctx.send("You now no longer have the guest role.")
 
 # Start Bot
 bot.start()
