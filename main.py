@@ -41,7 +41,7 @@ async def on_command_error(event: CommandError):
 async def on_member_update(event: MemberUpdate):
     before = event.before
     after = event.after
-    blossomz_bot_channel = event.client.get_channel(1222459301201973359)
+    managing_guests_channel = event.client.get_channel(1222459301201973359)
 
     # Resolve Guest Role
     if after.has_role(guest_role):
@@ -49,7 +49,7 @@ async def on_member_update(event: MemberUpdate):
         components = create_resolve_guest_buttons(username = event.after.username, display_name = event.after.display_name, member_id = event.after.id)
         action_rows = create_action_rows_horizontally(components)
 
-        await blossomz_bot_channel.send(content=content, components=action_rows)
+        await managing_guests_channel.send(content=content, components=action_rows)
 
 
 # Component Listeners
@@ -79,7 +79,7 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                     await member.remove_role(best_friend_role)   
 
                 await member.add_role(member_role) 
-                await ctx.edit_origin(content=f"{name} now has the Member role, the Guest role was removed.", components=[])
+                await ctx.edit_origin(content=f"{name} now has the Member role. The Guest role was removed.", components=[])
 
             case "best_friend":
                 member = ctx.guild.get_member(member_id)
@@ -92,7 +92,7 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                     await member.remove_role(friend_role)   
 
                 await member.add_role(best_friend_role) 
-                await ctx.edit_origin(content=f"{name} now has the Best Friend role, the Guest role was removed.", components=[])
+                await ctx.edit_origin(content=f"{name} now has the Best Friend role. The Guest role was removed.", components=[])
 
             case "friend":
                 member = ctx.guild.get_member(member_id)
@@ -105,7 +105,7 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                     await member.remove_role(best_friend_role)   
 
                 await member.add_role(friend_role) 
-                await ctx.edit_origin(content=f"{name} now has the Friend role, the Guest role was removed.", components=[])
+                await ctx.edit_origin(content=f"{name} now has the Friend role. The Guest role was removed.", components=[])
 
             case "guest":
                 await ctx.send(f"{name} will continue having the Guest role.")
