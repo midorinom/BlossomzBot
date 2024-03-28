@@ -6,32 +6,32 @@ def create_action_rows_horizontally(components):
     return action_rows
 
 
-def create_resolve_guest_buttons(display_name):
+def create_resolve_guest_buttons(username, display_name, member_id):
     member_button = Button(
         style=ButtonStyle.SUCCESS,
         label="Member",
-        custom_id=f"member_button_{display_name}",
+        custom_id=f"member_button_{username}_{display_name}_{member_id}",
         disabled=False,
     )
 
     best_friend_button = Button(
         style=ButtonStyle.PRIMARY,
         label="Best Friend",
-        custom_id=f"best_friend_button_{display_name}",
+        custom_id=f"best_friend_button_{username}_{display_name}_{member_id}",
         disabled=False,
     )
 
     friend_button = Button(
         style=ButtonStyle.DANGER,
         label="Friend",
-        custom_id=f"friend_button_{display_name}",
+        custom_id=f"friend_button_{username}_{display_name}_{member_id}",
         disabled=False,
     )
 
     guest_button = Button(
         style=ButtonStyle.SECONDARY,
         label="Remain as Guest",
-        custom_id=f"guest_button_{display_name}",
+        custom_id=f"guest_button_{username}_{display_name}_{member_id}",
         disabled=False,
     )
 

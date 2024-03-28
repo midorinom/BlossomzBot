@@ -15,6 +15,9 @@ SCOPES = [GUILD_ID]
 
 
 # Server Variables
+member_role = 1221723231862657059
+best_friend_role = 1221723231862657058
+friend_role = 1221723231862657057
 guest_role = 1221723231862657056
 
 
@@ -43,32 +46,72 @@ async def on_member_update(event: MemberUpdate):
     # Resolve Guest Role
     if after.has_role(guest_role):
         content = f"{event.after.display_name} has the Guest role. Which role do you want to change it to?"
-        components = create_resolve_guest_buttons(event.after.display_name)
+        components = create_resolve_guest_buttons(username = event.after.username, display_name = event.after.display_name, member_id = event.after.id)
         action_rows = create_action_rows_horizontally(components)
 
         await blossomz_bot_channel.send(content=content, components=action_rows)
 
 
 # Component Listeners
-resolve_guest_button_regex = re.compile(r"(\w+)_button_(\w+)")
+resolve_guest_button_regex = re.compile(r"(\w+)_button_(\w+)_(\w+)_([0-9]+)")
 @component_callback(resolve_guest_button_regex)
 async def resolve_guest_button_callback(ctx: ComponentContext):
     match = resolve_guest_button_regex.match(ctx.custom_id)
     if match:
         chosen_option = match.group(1)
-        display_name = match.group(2)
+        username = match.group(2)
+        display_name = match.group(3)
+        member_id = match.group(4)
+        
+        name = f"{display_name} ({username})"
+        if display_name == username:
+            name = display_name
 
         match (chosen_option):
             case "member":
-                await ctx.send(f"{display_name}'s role has been changed from Guest to Member.")
+                member = ctx.guild.get_member(member_id)
+                await member.remove_role(guest_role)
+
+                # Checking for extra roles
+                if member.has_role(friend_role):
+                    await member.remove_role(friend_role)
+                if member.has_role(best_friend_role):
+                    await member.remove_role(best_friend_role)   
+
+                await member.add_role(member_role) 
+                await ctx.edit_origin(content=f"{name} now has the Member role, the Guest role was removed.", components=[])
+
             case "best_friend":
-                await ctx.send(f"{display_name}'s role has been changed from Guest to Best Friend.")
+                member = ctx.guild.get_member(member_id)
+                await member.remove_role(guest_role)
+
+                # Checking for extra roles
+                if member.has_role(member_role):
+                    await member.remove_role(member_role)
+                if member.has_role(friend_role):
+                    await member.remove_role(friend_role)   
+
+                await member.add_role(best_friend_role) 
+                await ctx.edit_origin(content=f"{name} now has the Best Friend role, the Guest role was removed.", components=[])
+
             case "friend":
-                await ctx.send(f"{display_name}'s role has been changed from Guest to Friend.")
+                member = ctx.guild.get_member(member_id)
+                await member.remove_role(guest_role)
+
+                # Checking for extra roles
+                if member.has_role(member_role):
+                    await member.remove_role(member_role)
+                if member.has_role(best_friend_role):
+                    await member.remove_role(best_friend_role)   
+
+                await member.add_role(friend_role) 
+                await ctx.edit_origin(content=f"{name} now has the Friend role, the Guest role was removed.", components=[])
+
             case "guest":
-                await ctx.send(f"{display_name} will continue having the Guest role.")
+                await ctx.send(f"{name} will continue having the Guest role.")
+
             case _:
-                raise Exception(f"No option was selected for resolving {display_name}'s Guest role.")
+                raise Exception(f"No option was selected for resolving {name}'s Guest role.")
             
 
 # Slash Commands
