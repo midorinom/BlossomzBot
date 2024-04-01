@@ -4,7 +4,7 @@ from interactions import Client, Intents, listen, ComponentContext, component_ca
 from interactions.api.events import CommandError, MemberUpdate
 from functions import create_resolve_guest_buttons, create_action_rows_horizontally
 import traceback
-from config import member_role, best_friend_role, friend_role, guest_role
+from config import member_role, best_friend_role, friend_role, guest_role, managing_guests_channel_id
 import re
 
 
@@ -35,7 +35,7 @@ async def on_command_error(event: CommandError):
 async def on_member_update(event: MemberUpdate):
     before = event.before
     after = event.after
-    managing_guests_channel = event.client.get_channel(1222459301201973359)
+    managing_guests_channel = event.client.get_channel(managing_guests_channel_id)
 
     # Resolve Guest Role
     if after.has_role(guest_role):
