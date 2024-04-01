@@ -41,7 +41,7 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key -tt ${REMOTE_USER}@${REMOTE_HOST} '
             cd /home/ubuntu/BlossomzBot &&
-            source /venv/bin/activate &&
+            source venv/bin/activate &&
             pip install -r requirements.txt &&
             sudo systemctl restart BlossomzBot.service
             '
