@@ -1,0 +1,5 @@
+# Server Variables
+member_role = 1221723231862657059
+best_friend_role = 1221723231862657058
+friend_role = 1221723231862657057
+guest_role = 1221723231862657056

@@ -4,6 +4,7 @@ from interactions import Client, Intents, listen, ComponentContext, component_ca
 from interactions.api.events import CommandError, MemberUpdate
 from functions import create_resolve_guest_buttons, create_action_rows_horizontally
 import traceback
+from config import member_role, best_friend_role, friend_role, guest_role
 import re
 
 
@@ -12,13 +13,6 @@ load_dotenv()
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 GUILD_ID = getenv("GUILD_ID")
 SCOPES = [GUILD_ID]
-
-
-# Server Variables
-member_role = 1221723231862657059
-best_friend_role = 1221723231862657058
-friend_role = 1221723231862657057
-guest_role = 1221723231862657056
 
 
 # Initialise Bot
@@ -31,7 +25,7 @@ async def on_ready():
     print("Ready")
     print(f"This bot is owned by {bot.owner}.")
 
-@listen(CommandError, disable_default_listeners=True)  # tell the dispatcher that this replaces the default listener
+@listen(CommandError, disable_default_listeners=True) # tell the dispatcher that this replaces the default listener
 async def on_command_error(event: CommandError):
     traceback.print_exception(event.error)
     if not event.ctx.responded:
