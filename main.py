@@ -102,7 +102,7 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                 await ctx.edit_origin(content=f"{name} now has the Friend role. The Guest role was removed.", components=[])
 
             case "guest":
-                await ctx.send(f"{name} will continue having the Guest role.")
+                await ctx.edit_origin(content=f"{name} will continue having the Guest role.", components=[])
 
             case _:
                 raise Exception(f"No option was selected for resolving {name}'s Guest role.")
