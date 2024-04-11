@@ -18,7 +18,7 @@ SCOPES = [GUILD_ID]
 
 
 # Initialise Bot
-bot = Client(token=DISCORD_TOKEN, intents=Intents.DEFAULT | Intents.GUILD_MEMBERS)
+bot = Client(token=DISCORD_TOKEN, intents=Intents.DEFAULT | Intents.GUILD_MEMBERS, delete_unused_application_cmds=True)
 
 
 # Listeners
@@ -153,7 +153,7 @@ async def configure(ctx: SlashContext):
         await ctx.send("You do not have permission to use this command.", ephemeral=True)
     else:
         blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
-        
+
         await ctx.send("Loading...", ephemeral=True)
         await ctx.delete()
         await blossomz_bot_channel.send(content=generate_features_status(), components=generate_configure_select_component())
