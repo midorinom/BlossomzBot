@@ -104,15 +104,15 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                 await ctx.edit_origin(content=f"{name} now has the Friend role. The Guest role was removed.", components=[])
 
             case "guest":
-                member = ctx.guild.get_member(member_id)
+                # member = ctx.guild.get_member(member_id)
 
-                # Checking for extra roles
-                if member.has_role(config_values["member_role"]):
-                    await member.remove_role(config_values["member_role"])
-                if member.has_role(config_values["best_friend_role"]):
-                    await member.remove_role(config_values["best_friend_role"])
-                if member.has_role(config_values["friend_role"]):
-                    await member.remove_role(config_values["friend_role"])    
+                # # Checking for extra roles
+                # if member.has_role(config_values["member_role"]):
+                #     await member.remove_role(config_values["member_role"])
+                # if member.has_role(config_values["best_friend_role"]):
+                #     await member.remove_role(config_values["best_friend_role"])
+                # if member.has_role(config_values["friend_role"]):
+                #     await member.remove_role(config_values["friend_role"])    
 
                 await ctx.edit_origin(content=f"{name} will continue having the Guest role.", components=[])
 
