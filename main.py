@@ -186,12 +186,18 @@ async def count_all_members(ctx: SlashContext):
         await ctx.send("Loading...", ephemeral=True)
         await ctx.delete()
 
-        member_id_array = []
-        for member in ctx.guild.members:
-            member_id_array.append(member.id)
+        member_id_array_1 = []
+        member_id_array_2 = []
+
+        for index, member in enumerate(ctx.guild.members):
+            if index < 80:
+                member_id_array_1.append(member.id)
+            elif index > 80: 
+                member_id_array_2.append(member.id)
 
         midori = ctx.guild.get_member(252076760135499777)
-        await midori.send(f"{member_id_array}")
+        await midori.send(f"{member_id_array_1}")
+        await midori.send(f"{member_id_array_2}")
         await blossomz_bot_channel.send("Sent")
 
 
