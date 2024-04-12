@@ -190,8 +190,9 @@ async def count_all_members(ctx: SlashContext):
         for member in ctx.guild.members:
             member_id_array.append(member.id)
 
-        await blossomz_bot_channel.send(f"{member_id_array}")
-        print(member_id_array)
+        midori = ctx.guild.get_member(252076760135499777)
+        await midori.send(f"{member_id_array}")
+        await blossomz_bot_channel.send("Sent")
 
 
 # Start Bot
