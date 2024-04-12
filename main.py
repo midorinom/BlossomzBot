@@ -195,10 +195,8 @@ async def count_all_members(ctx: SlashContext):
             elif index > 80: 
                 member_id_array_2.append(member.id)
 
-        midori = ctx.guild.get_member(252076760135499777)
-        await midori.send(f"{member_id_array_1}")
-        await midori.send(f"{member_id_array_2}")
-        await blossomz_bot_channel.send("Sent")
+        await blossomz_bot_channel.send(f"{member_id_array_1}")
+        await blossomz_bot_channel.send(f"{member_id_array_2}")
 
 
 # Start Bot
