@@ -3,9 +3,11 @@ from dotenv import load_dotenv
 from interactions import Client, Intents, listen, ComponentContext, component_callback, slash_command, SlashContext
 from interactions.api.events import CommandError, MemberUpdate
 from config import config_values
-from functions import create_resolve_guest_buttons, create_action_rows_horizontally, convert_feature_to_config_key
+from functions import query_database, create_resolve_guest_buttons, create_action_rows_horizontally, convert_feature_to_config_key
+from sql_queries.managing_guests import sql_check_if_member_exists, sql_insert_member
 from components.select.ConfigureSelect import generate_configure_select_component
 from components.content.FeaturesStatus import generate_features_status
+from components.content.ErrorMessages import error_messages
 import traceback
 import re
 
@@ -15,6 +17,12 @@ load_dotenv()
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 GUILD_ID = getenv("GUILD_ID")
 SCOPES = [GUILD_ID]
+DATABASE_CREDENTIALS = {
+    "host": getenv("DB_HOST"),
+    "user": getenv("DB_USER"),
+    "password": getenv("DB_PASSWORD"),
+    "database_name": getenv("DB_NAME")
+}
 
 
 # Initialise Bot
@@ -38,14 +46,24 @@ async def on_member_update(event: MemberUpdate):
     before = event.before
     after = event.after
     managing_guests_channel = event.client.get_channel(config_values["managing_guests_channel_id"])
+    blossomz_bot_channel = event.client.get_channel(config_values["blossomz_bot_channel_id"])
 
     # Resolve Guest Role
     if config_values["status_managing_guests"] and after.has_role(config_values["guest_role"]):
-        content = f"{event.after.display_name} has the Guest role. Which role do you want to change it to?"
-        components = create_resolve_guest_buttons(username = event.after.username, display_name = event.after.display_name, member_id = event.after.id)
-        action_rows = create_action_rows_horizontally(components)
+        try:
+            result = query_database(sql_check_if_member_exists(event.after.id), DATABASE_CREDENTIALS)
 
-        await managing_guests_channel.send(content=content, components=action_rows)
+            if not result:
+                content = f"{event.after.display_name} has the Guest role. Which role do you want to change it to?"
+                components = create_resolve_guest_buttons(username = event.after.username, display_name = event.after.display_name, member_id = event.after.id)
+                action_rows = create_action_rows_horizontally(components)
+
+                await managing_guests_channel.send(content=content, components=action_rows)
+                query_database(sql_insert_member(event.after.id), DATABASE_CREDENTIALS, True)
+
+        except RuntimeError as e:
+            print(e)
+            await blossomz_bot_channel.send(error_messages["01"])
 
 
 # Component Listeners

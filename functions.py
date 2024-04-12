@@ -1,4 +1,32 @@
+import mysql.connector
 from interactions import ActionRow, Button, ButtonStyle
+
+def query_database(sql_command, database_credentials, need_to_commit = False):
+    try:
+        conn = mysql.connector.connect(
+        host=database_credentials["host"],
+        user=database_credentials["user"],
+        password=database_credentials["password"],
+        database=database_credentials["database_name"]
+        )
+        cursor = conn.cursor() 
+        cursor.execute(sql_command)
+
+        if not need_to_commit:
+            result = cursor.fetchall()
+            return result
+        else:
+            conn.commit()
+
+
+    except mysql.connector.Error as err:
+        raise RuntimeError(f"Error executing SQL command: {err}")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
 def create_action_rows_horizontally(components):
