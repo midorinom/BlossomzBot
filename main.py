@@ -176,7 +176,7 @@ async def configure(ctx: SlashContext):
         await ctx.delete()
         await blossomz_bot_channel.send(content=generate_features_status(), components=generate_configure_select_component())
     
-@slash_command(name="count_all_members", description="Counts all the members in the discord server", scopes=SCOPES)
+@slash_command(name="get_all_member_ids", description="Gets the id of all members in the discord server", scopes=SCOPES)
 async def count_all_members(ctx: SlashContext):
     if not ctx.member.has_role(config_values["leader_role"]) and not ctx.member.has_role(config_values["officer_role"]):
         await ctx.send("You do not have permission to use this command.", ephemeral=True)
@@ -185,8 +185,13 @@ async def count_all_members(ctx: SlashContext):
 
         await ctx.send("Loading...", ephemeral=True)
         await ctx.delete()
-        await blossomz_bot_channel.send(f"There are {len(ctx.guild.members)} members in {ctx.guild.name}.")
-        print(ctx.guild.members)
+
+        member_id_array = []
+        for member in ctx.guild.members:
+            member_id_array.append(member.id)
+
+        await blossomz_bot_channel.send(f"{member_id_array}")
+        print(member_id_array)
 
 
 # Start Bot
