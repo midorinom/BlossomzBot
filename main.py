@@ -26,7 +26,7 @@ DATABASE_CREDENTIALS = {
 
 
 # Initialise Bot
-bot = Client(token=DISCORD_TOKEN, intents=Intents.DEFAULT | Intents.GUILD_MEMBERS, delete_unused_application_cmds=True)
+bot = Client(token=DISCORD_TOKEN, intents=Intents.DEFAULT | Intents.GUILD_MEMBERS, delete_unused_application_cmds=True, fetch_members=True)
 
 
 # Listeners
@@ -181,8 +181,12 @@ async def count_all_members(ctx: SlashContext):
     if not ctx.member.has_role(config_values["leader_role"]) and not ctx.member.has_role(config_values["officer_role"]):
         await ctx.send("You do not have permission to use this command.", ephemeral=True)
     else:
-        print(len(ctx.guild.members))
-        await ctx.send(f"There are {len(ctx.guild.members)} members in {ctx.guild.name}.")
+        blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+
+        await ctx.send("Loading...", ephemeral=True)
+        await ctx.delete()
+        await blossomz_bot_channel.send(f"There are {len(ctx.guild.members)} members in {ctx.guild.name}.")
+        print(ctx.guild.members)
 
 
 # Start Bot
