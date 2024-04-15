@@ -48,8 +48,24 @@ async def on_member_update(event: MemberUpdate):
     managing_guests_channel = event.client.get_channel(config_values["managing_guests_channel_id"])
     blossomz_bot_channel = event.client.get_channel(config_values["blossomz_bot_channel_id"])
 
+    # Check for Multiple Roles
+    member = event.after.guild.get_member(event.after.id)
+    roles = 0
+
+    if member.has_role(config_values["member_role"]):
+        roles += 1
+    if member.has_role(config_values["best_friend_role"]):
+        roles += 1
+    if member.has_role(config_values["friend_role"]):
+        roles += 1
+    if member.has_role(config_values["guest_role"]):
+        roles += 1
+    
+    if roles > 1:
+        await blossomz_bot_channel.send(f"{event.after.display_name} ({event.after.username}) has multiple roles (member / best friend / friend / guest). Please remove the extra roles.")
+
     # Resolve Guest Role
-    if config_values["status_managing_guests"] and after.has_role(config_values["guest_role"]):
+    elif config_values["status_managing_guests"] and after.has_role(config_values["guest_role"]):
         try:
             result = query_database(sql_check_if_member_exists(event.after.id), DATABASE_CREDENTIALS)
 
@@ -84,54 +100,26 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
         match (chosen_option):
             case "member":
                 member = ctx.guild.get_member(member_id)
-                await member.remove_role(config_values["guest_role"])
 
-                # Checking for extra roles
-                if member.has_role(config_values["friend_role"]):
-                    await member.remove_role(config_values["friend_role"])
-                if member.has_role(config_values["best_friend_role"]):
-                    await member.remove_role(config_values["best_friend_role"])   
-
+                await member.remove_role(config_values["guest_role"]) 
                 await member.add_role(config_values["member_role"]) 
                 await ctx.edit_origin(content=f"{name} now has the Member role. The Guest role was removed.", components=[])
 
             case "best_friend":
                 member = ctx.guild.get_member(member_id)
+
                 await member.remove_role(config_values["guest_role"])
-
-                # Checking for extra roles
-                if member.has_role(config_values["member_role"]):
-                    await member.remove_role(config_values["member_role"])
-                if member.has_role(config_values["friend_role"]):
-                    await member.remove_role(config_values["friend_role"])   
-
                 await member.add_role(config_values["best_friend_role"]) 
                 await ctx.edit_origin(content=f"{name} now has the Best Friend role. The Guest role was removed.", components=[])
 
             case "friend":
                 member = ctx.guild.get_member(member_id)
+
                 await member.remove_role(config_values["guest_role"])
-
-                # Checking for extra roles
-                if member.has_role(config_values["member_role"]):
-                    await member.remove_role(config_values["member_role"])
-                if member.has_role(config_values["best_friend_role"]):
-                    await member.remove_role(config_values["best_friend_role"])   
-
                 await member.add_role(config_values["friend_role"]) 
                 await ctx.edit_origin(content=f"{name} now has the Friend role. The Guest role was removed.", components=[])
 
             case "guest":
-                # member = ctx.guild.get_member(member_id)
-
-                # # Checking for extra roles
-                # if member.has_role(config_values["member_role"]):
-                #     await member.remove_role(config_values["member_role"])
-                # if member.has_role(config_values["best_friend_role"]):
-                #     await member.remove_role(config_values["best_friend_role"])
-                # if member.has_role(config_values["friend_role"]):
-                #     await member.remove_role(config_values["friend_role"])    
-
                 await ctx.edit_origin(content=f"{name} will continue having the Guest role.", components=[])
 
             case _:
@@ -168,7 +156,7 @@ async def configure_select_callback(ctx: ComponentContext):
 @slash_command(name="configure", description="Shows the status of each BlossomzBot feature and allows for enabling/disabling them", scopes=SCOPES)
 async def configure(ctx: SlashContext):
     if not ctx.member.has_role(config_values["leader_role"]) and not ctx.member.has_role(config_values["officer_role"]):
-        await ctx.send("You do not have permission to use this command.", ephemeral=True)
+        await ctx.send("You do not have the permissions to use this command.", ephemeral=True)
     else:
         blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
 
