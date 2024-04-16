@@ -14,6 +14,7 @@ from controllers.sheetdb import create_in_holding_area
 import asyncio
 import traceback
 import re
+from datetime import datetime
 
 
 # Load Env Variables
@@ -70,7 +71,8 @@ async def on_member_update(event: MemberUpdate):
 
                 if not result:
                     content = f"{after.display_name} has the Guest role. Which role do you want to change it to?"
-                    components = create_resolve_guest_buttons(username = after.username, display_name = after.display_name, joined_at = after.joined_at, member_id = after.id)
+                    joined_at = str(after.joined_at).split(":")[1][:-1] # Extracting the numerical timestamp, in a string format
+                    components = create_resolve_guest_buttons(username = after.username, display_name = after.display_name, joined_at = joined_at, member_id = after.id)
                     action_rows = create_action_rows_horizontally(components)
 
                     await managing_guests_channel.send(content=content, components=action_rows)
@@ -90,13 +92,22 @@ async def on_member_update(event: MemberUpdate):
                     prev_role = queue_of_members[after.id]
                     del queue_of_members[after.id]
                 else:
-                    prev_role = sift_out_prev_role(before, new_role)
+                    if before.display_name == after.display_name and before.username == after.username:
+                        prev_role = sift_out_prev_role(before, new_role)
+                    else:
+                        prev_role = new_role
 
                 payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, new_role, after.joined_at, after.id)
 
                 response = await make_api_call(create_in_holding_area, payload)
                 if response["created"] > 0:
-                    await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has been successfully created in the spreadsheet.")
+                    if prev_role != new_role:
+                        await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s role has been changed from '{prev_role}' to '{new_role}'. This change has been successfully updated in the spreadsheet.")
+                    else:
+                        if before.display_name != after.display_name:
+                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their display name from '{before.display_name}'. This change has been successfully updated in the spreadsheet.")
+                        if before.username != after.username:
+                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their discord username from '{before.username}'. This change has been successfully updated in the spreadsheet.")
             
             except Exception as e:
                 print(e)
@@ -116,7 +127,7 @@ async def on_member_update(event: MemberUpdate):
 
             response = await make_api_call(create_in_holding_area, payload)
             if response["created"] > 0:
-                await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has been successfully created in the spreadsheet.")
+                await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed. This change has been successfully updated in the spreadsheet.")
         
 
 # Component Listeners
@@ -128,9 +139,9 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
         chosen_option = match.group(1)
         username = match.group(2)
         display_name = match.group(3)
-        joined_at = match.group(4)
+        joined_at = datetime.fromtimestamp(int(match.group(4)))
         member_id = match.group(5)
-        
+
         name = f"{display_name} ({username})"
         if display_name == username:
             name = display_name
@@ -166,7 +177,7 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
 
                     response = await make_api_call(create_in_holding_area, payload)
                     if response["created"] > 0:
-                        await blossomz_bot_channel.send(f"{display_name} ({username}) has been successfully created in the spreadsheet.")
+                        await blossomz_bot_channel.send(f"{display_name} ({username}) is a new Guest. A new record for them has been successfully created in the spreadsheet.")
                 
                 except Exception as e:
                     print(e)
