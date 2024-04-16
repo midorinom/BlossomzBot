@@ -3,11 +3,15 @@ from dotenv import load_dotenv
 from interactions import Client, Intents, listen, ComponentContext, component_callback, slash_command, SlashContext
 from interactions.api.events import CommandError, MemberUpdate
 from config import config_values
-from functions import query_database, create_resolve_guest_buttons, create_action_rows_horizontally, convert_feature_to_config_key
+from functions import query_database, create_resolve_guest_buttons, create_action_rows_horizontally, convert_feature_to_config_key, count_number_of_roles, get_prev_or_new_role, sift_out_prev_role
 from sql_queries.managing_guests import sql_check_if_member_exists, sql_insert_member
-from components.select.ConfigureSelect import generate_configure_select_component
-from components.content.FeaturesStatus import generate_features_status
-from components.content.ErrorMessages import error_messages
+from models.ConfigureSelect import generate_configure_select_component
+from models.FeaturesStatus import generate_features_status
+from models.ErrorMessages import error_messages
+from models.SheetDB import generate_payload_create_in_holding_area
+from controllers.general import make_api_call
+from controllers.sheetdb import create_in_holding_area
+import asyncio
 import traceback
 import re
 
@@ -29,6 +33,9 @@ DATABASE_CREDENTIALS = {
 bot = Client(token=DISCORD_TOKEN, intents=Intents.DEFAULT | Intents.GUILD_MEMBERS, delete_unused_application_cmds=True, fetch_members=True)
 
 
+# Initialise Queues
+queue_of_members = {}
+
 # Listeners
 @listen()
 async def on_ready():
@@ -49,41 +56,71 @@ async def on_member_update(event: MemberUpdate):
     blossomz_bot_channel = event.client.get_channel(config_values["blossomz_bot_channel_id"])
 
     # Check for Multiple Roles
-    member = event.after.guild.get_member(event.after.id)
-    roles = 0
-
-    if member.has_role(config_values["member_role"]):
-        roles += 1
-    if member.has_role(config_values["best_friend_role"]):
-        roles += 1
-    if member.has_role(config_values["friend_role"]):
-        roles += 1
-    if member.has_role(config_values["guest_role"]):
-        roles += 1
+    number_of_roles = count_number_of_roles(after)
     
-    if roles > 1:
-        await blossomz_bot_channel.send(f"{event.after.display_name} ({event.after.username}) has multiple roles (member / best friend / friend / guest). Please remove the extra roles.")
+    if number_of_roles > 1:
+        await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has multiple roles (member / best friend / friend / guest). Please remove the extra roles.")
 
-    # Resolve Guest Role
-    elif config_values["status_managing_guests"] and after.has_role(config_values["guest_role"]):
-        try:
-            result = query_database(sql_check_if_member_exists(event.after.id), DATABASE_CREDENTIALS)
+    # Has only 1 role
+    elif number_of_roles == 1:
+        # Resolve Guest Role
+        if config_values["status_managing_guests"] and after.has_role(config_values["guest_role"]):
+            try:
+                result = query_database(sql_check_if_member_exists(after.id), DATABASE_CREDENTIALS)
 
-            if not result:
-                content = f"{event.after.display_name} has the Guest role. Which role do you want to change it to?"
-                components = create_resolve_guest_buttons(username = event.after.username, display_name = event.after.display_name, member_id = event.after.id)
-                action_rows = create_action_rows_horizontally(components)
+                if not result:
+                    content = f"{after.display_name} has the Guest role. Which role do you want to change it to?"
+                    components = create_resolve_guest_buttons(username = after.username, display_name = after.display_name, joined_at = after.joined_at, member_id = after.id)
+                    action_rows = create_action_rows_horizontally(components)
 
-                await managing_guests_channel.send(content=content, components=action_rows)
-                query_database(sql_insert_member(event.after.id), DATABASE_CREDENTIALS, True)
+                    await managing_guests_channel.send(content=content, components=action_rows)
+                    query_database(sql_insert_member(after.id), DATABASE_CREDENTIALS, True)
 
-        except RuntimeError as e:
-            print(e)
-            await blossomz_bot_channel.send(error_messages["01"])
+            except Exception as e:
+                print(e)
+                await blossomz_bot_channel.send(error_messages["01"])
 
+        # New Role is not Guest Role
+        elif not after.has_role(config_values["guest_role"]):
+            try:
+                new_role = get_prev_or_new_role(after)
+                prev_role = ""
+
+                if after.id in queue_of_members:
+                    prev_role = queue_of_members[after.id]
+                    del queue_of_members[after.id]
+                else:
+                    prev_role = sift_out_prev_role(before, new_role)
+
+                payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, new_role, after.joined_at, after.id)
+
+                response = await make_api_call(create_in_holding_area, payload)
+                if response["created"] > 0:
+                    await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has been successfully created in the spreadsheet.")
+            
+            except Exception as e:
+                print(e)
+                await blossomz_bot_channel.send(error_messages["02"])
+
+    # A role has been removed
+    elif number_of_roles == 0:
+        # Store the previous role inside the queue
+        prev_role = get_prev_or_new_role(before)
+        queue_of_members[after.id] = prev_role
+
+        # Wait 30 seconds
+        await asyncio.sleep(30)
+        if after.id in queue_of_members:
+            del queue_of_members[after.id]
+            payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, "", after.joined_at, after.id)
+
+            response = await make_api_call(create_in_holding_area, payload)
+            if response["created"] > 0:
+                await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has been successfully created in the spreadsheet.")
+        
 
 # Component Listeners
-resolve_guest_button_regex = re.compile(r"(\w+)_button_(\w+)_(\w+)_([0-9]+)")
+resolve_guest_button_regex = re.compile(r"(\w+)_button_(\w+)_(\w+)_([0-9]+)_([0-9]+)")
 @component_callback(resolve_guest_button_regex)
 async def resolve_guest_button_callback(ctx: ComponentContext):
     match = resolve_guest_button_regex.match(ctx.custom_id)
@@ -91,7 +128,8 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
         chosen_option = match.group(1)
         username = match.group(2)
         display_name = match.group(3)
-        member_id = match.group(4)
+        joined_at = match.group(4)
+        member_id = match.group(5)
         
         name = f"{display_name} ({username})"
         if display_name == username:
@@ -121,6 +159,18 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
 
             case "guest":
                 await ctx.edit_origin(content=f"{name} will continue having the Guest role.", components=[])
+                blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+
+                try:
+                    payload = generate_payload_create_in_holding_area(display_name, username, "Guest", "Guest", joined_at, member_id)
+
+                    response = await make_api_call(create_in_holding_area, payload)
+                    if response["created"] > 0:
+                        await blossomz_bot_channel.send(f"{display_name} ({username}) has been successfully created in the spreadsheet.")
+                
+                except Exception as e:
+                    print(e)
+                    await blossomz_bot_channel.send(error_messages["02"])
 
             case _:
                 raise Exception(f"No option was selected for resolving {name}'s Guest role.")
