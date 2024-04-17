@@ -10,7 +10,7 @@ config_values = {
     "blossomz_bot_channel_id": 1228048470888288377,
 
     # Sheetdb Endpoint URL
-    "sheetdb_url": "https://sheetdb.io/api/v1/jf9lchfs84f9f",
+    "sheetdb_url": "https://sheetdb.io/api/v1/nsfxy76woarwz",
     "sheetdb_alt_url": "https://sheetdb.io/api/v1/jf9lchfs84f9f",
 
     # Status of Bot Features
