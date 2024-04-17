@@ -18,8 +18,6 @@ def query_database(sql_command, database_credentials, need_to_commit = False):
             return result
         else:
             conn.commit()
-
-
     except mysql.connector.Error as err:
         raise RuntimeError(f"Error executing SQL command: {err}")
 

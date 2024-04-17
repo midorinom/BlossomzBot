@@ -1,10 +1,10 @@
 from os import getenv
 from dotenv import load_dotenv
 from interactions import Client, Intents, listen, ComponentContext, component_callback, slash_command, SlashContext
-from interactions.api.events import CommandError, MemberUpdate
+from interactions.api.events import CommandError, MemberUpdate, MemberRemove
 from config import config_values
 from functions import query_database, create_resolve_guest_buttons, create_action_rows_horizontally, convert_feature_to_config_key, count_number_of_roles, get_prev_or_new_role, sift_out_prev_role
-from sql_queries.managing_guests import sql_check_if_member_exists, sql_insert_member
+from sql_queries.managing_members import sql_check_if_member_exists, sql_insert_member, sql_delete_member
 from models.ConfigureSelect import generate_configure_select_component
 from models.FeaturesStatus import generate_features_status
 from models.ErrorMessages import error_messages
@@ -77,7 +77,6 @@ async def on_member_update(event: MemberUpdate):
 
                     await managing_guests_channel.send(content=content, components=action_rows)
                     query_database(sql_insert_member(after.id), DATABASE_CREDENTIALS, True)
-
             except Exception as e:
                 print(e)
                 await blossomz_bot_channel.send(error_messages["01"])
@@ -108,27 +107,42 @@ async def on_member_update(event: MemberUpdate):
                             await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their display name from '{before.display_name}'.")
                         if before.username != after.username:
                             await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their discord username from '{before.username}'.")
-            
             except Exception as e:
                 print(e)
                 await blossomz_bot_channel.send(error_messages["02"])
 
     # A role has been removed
     elif number_of_roles == 0:
-        # Store the previous role inside the queue
         prev_role = get_prev_or_new_role(before)
+        # Store the previous role inside the queue
         queue_of_members[after.id] = prev_role
 
         # Wait 30 seconds
         await asyncio.sleep(30)
         if after.id in queue_of_members:
             del queue_of_members[after.id]
-            payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, "", after.joined_at, after.id)
 
-            response = await make_api_call(create_in_holding_area, payload)
-            if response["created"] > 0:
-                await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed.")
-        
+            try:
+                payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, "", after.joined_at, after.id)
+
+                response = await make_api_call(create_in_holding_area, payload)
+                if response["created"] > 0:
+                    await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed.")
+            except Exception as e:
+                print(e)
+                await blossomz_bot_channel.send(error_messages["02"])
+
+
+# If the member has left the discord server
+@listen(MemberRemove)
+async def on_member_remove(event: MemberRemove):
+    blossomz_bot_channel = event.client.get_channel(config_values["blossomz_bot_channel_id"])
+    
+    try:
+        query_database(sql_delete_member(event.member.id), DATABASE_CREDENTIALS, True)
+    except Exception as e:
+        print(e)
+        await blossomz_bot_channel.send(error_messages["03"])
 
 # Component Listeners
 resolve_guest_button_regex = re.compile(r"(\w+)_button_(\w+)_(\w+)_([0-9]+)_([0-9]+)")
@@ -175,7 +189,6 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                 try:
                     payload = generate_payload_create_in_holding_area(display_name, username, "Guest", "Guest", joined_at, member_id)
                     response = await make_api_call(create_in_holding_area, payload)
-                
                 except Exception as e:
                     print(e)
                     await blossomz_bot_channel.send(error_messages["02"])
