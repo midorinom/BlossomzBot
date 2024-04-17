@@ -9,11 +9,17 @@ config_values = {
     "managing_guests_channel_id": 1224436286048305192,
     "blossomz_bot_channel_id": 1228048470888288377,
 
+    # Sheetdb Endpoint URL
+    "sheetdb_url": "https://sheetdb.io/api/v1/jf9lchfs84f9f",
+    "sheetdb_alt_url": "https://sheetdb.io/api/v1/jf9lchfs84f9f",
+
     # Status of Bot Features
     "status_managing_guests": True,
+    "status_automatic_sheet_updates": True,
 }
 
-# dev_config_values = {
+# # Dev Config
+# config_values = {
 #     # Server Variables
 #     "leader_role": 1221723231980093474,
 #     "officer_role": 1221723231980093473,
@@ -25,10 +31,11 @@ config_values = {
 #     "blossomz_bot_channel_id": 1228048206701793421,
 
 #     # Sheetdb Endpoint URL
-#     "sheetdb_url": "https://sheetdb.io/api/v1/xiq07ncvs2p79",
+#     "sheetdb_url": "https://sheetdb.io/api/v1/jf9lchfs84f9f",
+#     "sheetdb_alt_url": "https://sheetdb.io/api/v1/jf9lchfs84f9f",
 
 #     # Status of Bot Features
 #     "status_managing_guests": True,
-#     "status_full_spreadsheet_update": False,
+#     "status_automatic_sheet_updates": True,
 # }
 
