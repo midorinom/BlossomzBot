@@ -1,4 +1,3 @@
-# Insert all member ids into the members table
 @slash_command(name="insert_all_member_ids", description="Inserts the id of everyone in the discord server into the members table", scopes=SCOPES)
 async def insert_all_member_ids(ctx: SlashContext):
     if not ctx.member.has_role(config_values["leader_role"]) and not ctx.member.has_role(config_values["officer_role"]):
@@ -19,3 +18,33 @@ async def insert_all_member_ids(ctx: SlashContext):
                 query_database(sql_insert_member(member_id), DATABASE_CREDENTIALS, True)
 
         await blossomz_bot_channel.send(f"All member ids have been inserted.")
+
+@slash_command(name="write_all_to_spreadsheet", description="Adds everyone in the server to the spreadsheet", scopes=SCOPES)
+async def write_all_to_spreadsheet(ctx: SlashContext):
+    if not ctx.member.has_role(config_values["leader_role"]) and not ctx.member.has_role(config_values["officer_role"]):
+        await ctx.send("You do not have permission to use this command.", ephemeral=True)
+    else:
+        blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+        await ctx.send("Loading...", ephemeral=True)
+        await ctx.delete()
+
+        if config_values['status_automatic_sheet_updates']:
+            for member in ctx.guild.members:
+                if not member.bot:
+                    total_roles = count_number_of_roles(member)
+
+                    if total_roles > 1:
+                        await blossomz_bot_channel.send(f"{member.display_name} ({member.username}) has multiple roles (member / best friend / friend / guest). Please remove the extra roles.")
+                        continue
+                    else:
+                        new_role = get_prev_or_new_role(member)
+
+                        try:
+                            payload = generate_payload_create_in_holding_area(member.display_name, member.username, "", new_role, member.joined_at, member.id)
+                            response = await make_api_call(create_in_holding_area, payload)
+                        except Exception as e:
+                            print(e)
+                            await blossomz_bot_channel.send(error_messages["02"])
+
+            await blossomz_bot_channel.send(f"All Blossomz discord users have been added to the spreadsheet.")
+            
