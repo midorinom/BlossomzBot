@@ -6,7 +6,7 @@ def generate_payload_create_in_holding_area(display_name, discord_username, prev
         "Discord Username": discord_username,
         "Previous Role": previous_role,
         "New Role": new_role,
-        "Date Joined": str(joined_at.date().strftime("%d %B %Y")),
+        "Date Joined": "'" + str(joined_at.date().strftime("%d %B %Y")) + "'",
         "Member ID": str(member_id)
         }
     

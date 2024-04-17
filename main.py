@@ -102,12 +102,12 @@ async def on_member_update(event: MemberUpdate):
                 response = await make_api_call(create_in_holding_area, payload)
                 if response["created"] > 0:
                     if prev_role != new_role:
-                        await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s role has been changed from '{prev_role}' to '{new_role}'. This change has been successfully updated in the spreadsheet.")
+                        await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s role has been changed from '{prev_role}' to '{new_role}'.")
                     else:
                         if before.display_name != after.display_name:
-                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their display name from '{before.display_name}'. This change has been successfully updated in the spreadsheet.")
+                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their display name from '{before.display_name}'.")
                         if before.username != after.username:
-                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their discord username from '{before.username}'. This change has been successfully updated in the spreadsheet.")
+                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their discord username from '{before.username}'.")
             
             except Exception as e:
                 print(e)
@@ -127,7 +127,7 @@ async def on_member_update(event: MemberUpdate):
 
             response = await make_api_call(create_in_holding_area, payload)
             if response["created"] > 0:
-                await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed. This change has been successfully updated in the spreadsheet.")
+                await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed.")
         
 
 # Component Listeners
@@ -174,10 +174,7 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
 
                 try:
                     payload = generate_payload_create_in_holding_area(display_name, username, "Guest", "Guest", joined_at, member_id)
-
                     response = await make_api_call(create_in_holding_area, payload)
-                    if response["created"] > 0:
-                        await blossomz_bot_channel.send(f"{display_name} ({username}) is a new Guest. A new record for them has been successfully created in the spreadsheet.")
                 
                 except Exception as e:
                     print(e)
