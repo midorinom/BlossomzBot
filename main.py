@@ -235,6 +235,28 @@ async def configure(ctx: SlashContext):
         await ctx.delete()
         await blossomz_bot_channel.send(content=generate_features_status(), components=generate_configure_select_component())
 
+@slash_command(name="write_all_to_spreadsheet", description="Adds everyone in the server to the spreadsheet", scopes=SCOPES)
+async def write_all_to_spreadsheet(ctx: SlashContext):
+    if not ctx.member.has_role(config_values["leader_role"]) and not ctx.member.has_role(config_values["officer_role"]):
+        await ctx.send("You do not have permission to use this command.", ephemeral=True)
+    else:
+        blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+        await ctx.send("Loading...", ephemeral=True)
+        await ctx.delete()
+
+        for member in ctx.guild.members:
+            if not member.bot:
+                total_roles = count_number_of_roles(member)
+
+                if total_roles > 1:
+                    await blossomz_bot_channel.send(f"{member.display_name} ({member.username}) has multiple roles (member / best friend / friend / guest). Please remove the extra roles.")
+                    continue
+                else:
+                    new_role = get_prev_or_new_role(member)
+                    payload = generate_payload_create_in_holding_area(member.display_name, member.username, "", new_role, member.joined_at, member.id)
+                    response = await make_api_call(create_in_holding_area, payload)
+
+        await blossomz_bot_channel.send(f"All Blossomz discord users have been added to the spreadsheet.")
 
 # Start Bot
 bot.start()
