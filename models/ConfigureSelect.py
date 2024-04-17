@@ -4,7 +4,7 @@ from config import config_values
 def generate_configure_options():
     configure_options = [
         f"{'Disable' if config_values['status_managing_guests'] else 'Enable'} 'Managing Guests' Feature\n",
-        f"{'Disable' if config_values['status_full_spreadsheet_update'] else 'Enable'} 'Full Spreadsheet Update' Feature\n",
+        f"{'Disable' if config_values['status_automatic_sheet_updates'] else 'Enable'} 'Automatic Sheet Updates' Feature\n",
         "Done"
         ]
     

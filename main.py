@@ -83,33 +83,33 @@ async def on_member_update(event: MemberUpdate):
 
         # New Role is not Guest Role
         elif not after.has_role(config_values["guest_role"]):
-            try:
-                new_role = get_prev_or_new_role(after)
-                prev_role = ""
+            new_role = get_prev_or_new_role(after)
+            prev_role = ""
 
-                if after.id in queue_of_members:
-                    prev_role = queue_of_members[after.id]
-                    del queue_of_members[after.id]
+            if after.id in queue_of_members:
+                prev_role = queue_of_members[after.id]
+                del queue_of_members[after.id]
+            else:
+                if before.display_name == after.display_name and before.username == after.username:
+                    prev_role = sift_out_prev_role(before, new_role)
                 else:
-                    if before.display_name == after.display_name and before.username == after.username:
-                        prev_role = sift_out_prev_role(before, new_role)
-                    else:
-                        prev_role = new_role
+                    prev_role = new_role
 
-                payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, new_role, after.joined_at, after.id)
+            if prev_role != new_role:
+                await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s role has been changed from '{prev_role}' to '{new_role}'.")
+            else:
+                if before.display_name != after.display_name:
+                    await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their display name from '{before.display_name}'.")
+                if before.username != after.username:
+                    await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their discord username from '{before.username}'.")
 
-                response = await make_api_call(create_in_holding_area, payload)
-                if response["created"] > 0:
-                    if prev_role != new_role:
-                        await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s role has been changed from '{prev_role}' to '{new_role}'.")
-                    else:
-                        if before.display_name != after.display_name:
-                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their display name from '{before.display_name}'.")
-                        if before.username != after.username:
-                            await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their discord username from '{before.username}'.")
-            except Exception as e:
-                print(e)
-                await blossomz_bot_channel.send(error_messages["02"])
+            if config_values['status_automatic_sheet_updates']:
+                try:
+                    payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, new_role, after.joined_at, after.id)
+                    response = await make_api_call(create_in_holding_area, payload)
+                except Exception as e:
+                    print(e)
+                    await blossomz_bot_channel.send(error_messages["02"])
 
     # A role has been removed
     elif number_of_roles == 0:
@@ -122,12 +122,12 @@ async def on_member_update(event: MemberUpdate):
         if after.id in queue_of_members:
             del queue_of_members[after.id]
 
+        await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed.")
+       
+        if config_values['status_automatic_sheet_updates']:
             try:
                 payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, "", after.joined_at, after.id)
-
                 response = await make_api_call(create_in_holding_area, payload)
-                if response["created"] > 0:
-                    await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed.")
             except Exception as e:
                 print(e)
                 await blossomz_bot_channel.send(error_messages["02"])
@@ -185,13 +185,14 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
             case "guest":
                 await ctx.edit_origin(content=f"{name} will continue having the Guest role.", components=[])
                 blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
-
-                try:
-                    payload = generate_payload_create_in_holding_area(display_name, username, "Guest", "Guest", joined_at, member_id)
-                    response = await make_api_call(create_in_holding_area, payload)
-                except Exception as e:
-                    print(e)
-                    await blossomz_bot_channel.send(error_messages["02"])
+                
+                if config_values['status_automatic_sheet_updates']:
+                    try:
+                        payload = generate_payload_create_in_holding_area(display_name, username, "Guest", "Guest", joined_at, member_id)
+                        response = await make_api_call(create_in_holding_area, payload)
+                    except Exception as e:
+                        print(e)
+                        await blossomz_bot_channel.send(error_messages["02"])
 
             case _:
                 raise Exception(f"No option was selected for resolving {name}'s Guest role.")
@@ -244,19 +245,25 @@ async def write_all_to_spreadsheet(ctx: SlashContext):
         await ctx.send("Loading...", ephemeral=True)
         await ctx.delete()
 
-        for member in ctx.guild.members:
-            if not member.bot:
-                total_roles = count_number_of_roles(member)
+        if config_values['status_automatic_sheet_updates']:
+            for member in ctx.guild.members:
+                if not member.bot:
+                    total_roles = count_number_of_roles(member)
 
-                if total_roles > 1:
-                    await blossomz_bot_channel.send(f"{member.display_name} ({member.username}) has multiple roles (member / best friend / friend / guest). Please remove the extra roles.")
-                    continue
-                else:
-                    new_role = get_prev_or_new_role(member)
-                    payload = generate_payload_create_in_holding_area(member.display_name, member.username, "", new_role, member.joined_at, member.id)
-                    response = await make_api_call(create_in_holding_area, payload)
+                    if total_roles > 1:
+                        await blossomz_bot_channel.send(f"{member.display_name} ({member.username}) has multiple roles (member / best friend / friend / guest). Please remove the extra roles.")
+                        continue
+                    else:
+                        new_role = get_prev_or_new_role(member)
 
-        await blossomz_bot_channel.send(f"All Blossomz discord users have been added to the spreadsheet.")
+                        try:
+                            payload = generate_payload_create_in_holding_area(member.display_name, member.username, "", new_role, member.joined_at, member.id)
+                            response = await make_api_call(create_in_holding_area, payload)
+                        except Exception as e:
+                            print(e)
+                            await blossomz_bot_channel.send(error_messages["02"])
+
+            await blossomz_bot_channel.send(f"All Blossomz discord users have been added to the spreadsheet.")
 
 # Start Bot
 bot.start()

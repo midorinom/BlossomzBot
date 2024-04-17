@@ -30,5 +30,6 @@ config_values = {
 
     # Status of Bot Features
     "status_managing_guests": True,
+    "status_automatic_sheet_updates": True,
 }
 
