@@ -91,6 +91,11 @@ async def on_member_update(event: MemberUpdate):
                 del queue_of_members[after.id]
             else:
                 if before.display_name == after.display_name and before.username == after.username:
+                    # User has been updated in ways other than display name / username / role (e.g. profile picture)
+                    number_of_prev_roles = count_number_of_roles(before)
+                    if number_of_prev_roles == number_of_roles:
+                        return
+                    
                     prev_role = sift_out_prev_role(before, new_role)
                 else:
                     prev_role = new_role
