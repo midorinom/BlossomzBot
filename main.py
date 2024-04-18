@@ -7,7 +7,7 @@ from functions import query_database, create_resolve_guest_buttons, create_actio
 from sql_queries.managing_members import sql_check_if_member_exists, sql_insert_member, sql_delete_member
 from models.ConfigureSelect import generate_configure_select_component
 from models.FeaturesStatus import generate_features_status
-from models.Messages import error_messages, kick_message
+from models.Messages import error_messages, kick_message, welcome_message
 from models.SheetDB import generate_payload_create_in_holding_area
 from controllers.general import make_api_call
 from controllers.sheetdb import create_in_holding_area
@@ -112,7 +112,7 @@ async def on_member_update(event: MemberUpdate):
                 if before.username != after.username:
                     await blossomz_bot_channel.send(f"{after.display_name} ({after.username}) has changed their discord username from '{before.username}'.")
 
-            if config_values['status_automatic_sheet_updates']:
+            if config_values['status_automated_sheet_updates']:
                 try:
                     payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, new_role, after.joined_at, after.id)
                     response = await make_api_call(create_in_holding_area, payload)
@@ -132,7 +132,7 @@ async def on_member_update(event: MemberUpdate):
             del queue_of_members[after.id]
             await blossomz_bot_channel.send(f"{after.display_name} ({after.username})'s '{prev_role}' role was removed.")
         
-            if config_values['status_automatic_sheet_updates']:
+            if config_values['status_automated_sheet_updates']:
                 try:
                     payload = generate_payload_create_in_holding_area(after.display_name, after.username, prev_role, "", after.joined_at, after.id)
                     response = await make_api_call(create_in_holding_area, payload)
@@ -176,12 +176,32 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                 await member.add_role(config_values["member_role"]) 
                 await ctx.edit_origin(content=f"{name} now has the Member role. The Guest role was removed.", components=[])
 
+                if config_values['status_welcome_message']:
+                    blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+
+                    try:
+                        await member.send(welcome_message)
+                        await blossomz_bot_channel.send(f"A welcome message has been sent to {name}.")
+                    except Exception as e:
+                        print(e)
+                        await blossomz_bot_channel.send(error_messages["05"])
+
             case "best_friend":
                 member = ctx.guild.get_member(member_id)
 
                 await member.remove_role(config_values["guest_role"])
                 await member.add_role(config_values["best_friend_role"]) 
                 await ctx.edit_origin(content=f"{name} now has the Best Friend role. The Guest role was removed.", components=[])
+
+                if config_values['status_welcome_message']:
+                    blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+
+                    try:
+                        await member.send(welcome_message)
+                        await blossomz_bot_channel.send(f"A welcome message has been sent to {name} ({username}).")
+                    except Exception as e:
+                        print(e)
+                        await blossomz_bot_channel.send(error_messages["05"])
 
             case "friend":
                 member = ctx.guild.get_member(member_id)
@@ -194,7 +214,7 @@ async def resolve_guest_button_callback(ctx: ComponentContext):
                 await ctx.edit_origin(content=f"{name} will continue having the Guest role.", components=[])
                 blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
                 
-                if config_values['status_automatic_sheet_updates']:
+                if config_values['status_automated_sheet_updates']:
                     try:
                         payload = generate_payload_create_in_holding_area(display_name, username, "Guest", "Guest", joined_at, member_id)
                         response = await make_api_call(create_in_holding_area, payload)
@@ -256,6 +276,7 @@ async def kick_nicely_callback(ctx: ComponentContext):
                 await ctx.defer(edit_origin=True)
                 await ctx.delete(ctx.message)
                 await blossomz_bot_channel.send(content=f"{display_name} ({username}) has been kicked using the 'kick_nicely' command. A private message has been sent to them.")
+            
             case "no":
                 await ctx.defer(edit_origin=True)
                 await ctx.delete(ctx.message)
