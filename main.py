@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from interactions import Client, Intents, listen, ComponentContext, component_callback, SlashContext, OptionType, slash_command, slash_option
 from interactions.api.events import CommandError, MemberUpdate, MemberRemove
 from config import config_values
-from functions import query_database, create_resolve_guest_buttons, create_action_rows_horizontally, convert_feature_to_config_key, count_number_of_roles, get_prev_or_new_role, sift_out_prev_role, create_kick_nicely_buttons
+from functions import query_database, create_resolve_guest_buttons, create_action_rows_horizontally, convert_feature_to_config_key, count_number_of_roles, get_prev_or_new_role, sift_out_prev_role, create_kick_nicely_buttons, create_send_welcome_message_buttons
 from sql_queries.managing_members import sql_check_if_member_exists, sql_insert_member, sql_delete_member
 from models.ConfigureSelect import generate_configure_select_component
 from models.FeaturesStatus import generate_features_status
@@ -153,15 +153,15 @@ async def on_member_remove(event: MemberRemove):
         await blossomz_bot_channel.send(error_messages["03"])
 
 # Component Listeners
-resolve_guest_button_regex = re.compile(r"(\w+)_button_(\w+)_(\w+)_([0-9]+)_([0-9]+)")
+resolve_guest_button_regex = re.compile(r"(\w+)_button_(\w+)_([0-9]+)_(\w+)_([0-9]+)")
 @component_callback(resolve_guest_button_regex)
 async def resolve_guest_button_callback(ctx: ComponentContext):
     match = resolve_guest_button_regex.match(ctx.custom_id)
     if match:
         chosen_option = match.group(1)
         username = match.group(2)
-        display_name = match.group(3)
-        joined_at = datetime.fromtimestamp(int(match.group(4)))
+        display_name = match.group(4)
+        joined_at = datetime.fromtimestamp(int(match.group(3)))
         member_id = match.group(5)
 
         name = f"{display_name} ({username})"
@@ -251,15 +251,46 @@ async def configure_select_callback(ctx: ComponentContext):
 
                 await ctx.edit_origin(content=f"The '{feature}' feature is now disabled.\n\n{generate_features_status()}", components=[])
 
-kick_nicely_regex = re.compile(r"kick_nicely_(\w+)_(\w+)_(\w+)_([0-9]+)")
+kick_nicely_regex = re.compile(r"kick_nicely_(yes|no)_(\w+)_([0-9]+)_(\w+)")
 @component_callback(kick_nicely_regex)
 async def kick_nicely_callback(ctx: ComponentContext):
     match = kick_nicely_regex.match(ctx.custom_id)
     if match:
         chosen_option = match.group(1)
         username = match.group(2)
-        display_name = match.group(3)
-        member_id = match.group(4)
+        display_name = match.group(4)
+        member_id = match.group(3)
+
+        match (chosen_option):
+            case "yes":
+                blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+                member = ctx.guild.get_member(member_id)
+                
+                await ctx.defer(edit_origin=True)
+                await ctx.delete(ctx.message)
+
+                try:
+                    await member.send(kick_message) 
+                    await blossomz_bot_channel.send(content=f"{display_name} ({username}) has been kicked using the 'kick_nicely' command. A private message has been sent to them.")
+                except Exception as e:
+                    print(e)
+                    await blossomz_bot_channel.send(error_messages["04"])
+
+                await ctx.guild.kick(member_id)
+            
+            case "no":
+                await ctx.defer(edit_origin=True)
+                await ctx.delete(ctx.message)
+
+send_welcome_message_regex = re.compile(r"send_welcome_message_(yes|no)_(\w+)_([0-9]+)_(\w+)")
+@component_callback(send_welcome_message_regex)
+async def send_welcome_message_callback(ctx: ComponentContext):
+    match = send_welcome_message_regex.match(ctx.custom_id)
+    if match:
+        chosen_option = match.group(1)
+        username = match.group(2)
+        display_name = match.group(4)
+        member_id = match.group(3)
 
         match (chosen_option):
             case "yes":
@@ -267,20 +298,18 @@ async def kick_nicely_callback(ctx: ComponentContext):
                 member = ctx.guild.get_member(member_id)
                 
                 try:
-                    await member.send(kick_message)  
+                    await member.send(welcome_message)  
                 except Exception as e:
                     print(e)
-                    await blossomz_bot_channel.send(error_messages["04"])
+                    await blossomz_bot_channel.send(error_messages["05"])
 
-                await ctx.guild.kick(member_id)
                 await ctx.defer(edit_origin=True)
                 await ctx.delete(ctx.message)
-                await blossomz_bot_channel.send(content=f"{display_name} ({username}) has been kicked using the 'kick_nicely' command. A private message has been sent to them.")
+                await blossomz_bot_channel.send(content=f"A welcome message has been sent to {display_name} ({username}).")
             
             case "no":
                 await ctx.defer(edit_origin=True)
                 await ctx.delete(ctx.message)
-
 
 # Slash Commands
 @slash_command(name="configure", description="Shows the status of each BlossomzBot feature and allows for enabling/disabling them", scopes=SCOPES)
@@ -315,6 +344,28 @@ async def kick_nicely(ctx: SlashContext, discord_user_id: str):
         components = create_kick_nicely_buttons(username = member.username, display_name = member.display_name, member_id = discord_user_id)
         action_rows = create_action_rows_horizontally(components)
         await blossomz_bot_channel.send(content=f"Hello <@{ctx.author_id}>.\nAre you sure you want to kick {member.display_name} ({member.username})?", components=action_rows, ephemeral=True)
+
+
+@slash_command(name="send_welcome_message", description="Sends a private welcome message to the discord user.", scopes=SCOPES)
+@slash_option(
+    name="discord_user_id",
+    description="You can get this by right clicking on the user and selecting 'Copy User ID'.",
+    required=True,
+    opt_type=OptionType.STRING
+)
+async def send_welcome_message(ctx: SlashContext, discord_user_id: str):
+    if not ctx.member.has_role(config_values["leader_role"]) and not ctx.member.has_role(config_values["officer_role"]):
+        await ctx.send("You do not have the permissions to use this command.", ephemeral=True)
+    else:
+        blossomz_bot_channel = ctx.guild.get_channel(config_values["blossomz_bot_channel_id"])
+        member = ctx.guild.get_member(discord_user_id)
+        
+        await ctx.send("Loading...", ephemeral=True)
+        await ctx.delete()
+
+        components = create_send_welcome_message_buttons(username = member.username, display_name = member.display_name, member_id = discord_user_id)
+        action_rows = create_action_rows_horizontally(components)
+        await blossomz_bot_channel.send(content=f"Hello <@{ctx.author_id}>.\nAre you sure you want to send a welcome message to {member.display_name} ({member.username})?", components=action_rows, ephemeral=True)
 
 
 # Start Bot
