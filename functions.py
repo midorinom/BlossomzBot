@@ -36,31 +36,32 @@ def create_resolve_guest_buttons(username, display_name, joined_at, member_id):
     member_button = Button(
         style=ButtonStyle.SUCCESS,
         label="Member",
-        custom_id=f"member_button_{username}_{display_name}_{joined_at}_{member_id}",
+        custom_id=f"member_button_{username}_{joined_at}_{display_name}_{member_id}",
         disabled=False,
     )
 
     best_friend_button = Button(
         style=ButtonStyle.PRIMARY,
         label="Best Friend",
-        custom_id=f"best_friend_button_{username}_{display_name}_{joined_at}_{member_id}",
+        custom_id=f"best_friend_button_{username}_{joined_at}_{display_name}_{member_id}",
         disabled=False,
     )
 
     friend_button = Button(
         style=ButtonStyle.DANGER,
         label="Friend",
-        custom_id=f"friend_button_{username}_{display_name}_{joined_at}_{member_id}",
+        custom_id=f"friend_button_{username}_{joined_at}_{display_name}_{member_id}",
         disabled=False,
     )
 
     guest_button = Button(
         style=ButtonStyle.SECONDARY,
         label="Remain as Guest",
-        custom_id=f"guest_button_{username}_{display_name}_{joined_at}_{member_id}",
+        custom_id=f"guest_button_{username}_{joined_at}_{display_name}_{member_id}",
         disabled=False,
     )
 
+    print([member_button, best_friend_button, friend_button, guest_button])
     return [member_button, best_friend_button, friend_button, guest_button]
 
 def convert_feature_to_config_key(feature):
@@ -115,3 +116,37 @@ def sift_out_prev_role(member_before, new_role):
         prev_role = "Friend"
 
     return prev_role
+
+def create_kick_nicely_buttons(username, display_name, member_id):
+    yes_button = Button(
+        style=ButtonStyle.SUCCESS,
+        label="Yes",
+        custom_id=f"kick_nicely_yes_{username}_{member_id}_{display_name}",
+        disabled=False,
+    )
+
+    no_button = Button(
+        style=ButtonStyle.DANGER,
+        label="No",
+        custom_id=f"kick_nicely_no_{username}_{member_id}_{display_name}",
+        disabled=False,
+    )
+
+    return [yes_button, no_button]
+
+def create_send_welcome_message_buttons(username, display_name, member_id):
+    yes_button = Button(
+        style=ButtonStyle.SUCCESS,
+        label="Yes",
+        custom_id=f"send_welcome_message_yes_{username}_{member_id}_{display_name}",
+        disabled=False,
+    )
+
+    no_button = Button(
+        style=ButtonStyle.DANGER,
+        label="No",
+        custom_id=f"send_welcome_message_no_{username}_{member_id}_{display_name}",
+        disabled=False,
+    )
+
+    return [yes_button, no_button]

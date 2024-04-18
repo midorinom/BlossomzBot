@@ -4,7 +4,8 @@ from config import config_values
 def generate_configure_options():
     configure_options = [
         f"{'Disable' if config_values['status_managing_guests'] else 'Enable'} 'Managing Guests' Feature\n",
-        f"{'Disable' if config_values['status_automatic_sheet_updates'] else 'Enable'} 'Automatic Sheet Updates' Feature\n",
+        f"{'Disable' if config_values['status_automated_sheet_updates'] else 'Enable'} 'automated Sheet Updates' Feature\n",
+        f"{'Disable' if config_values['status_welcome_message'] else 'Enable'} 'Welcome Message' Feature\n",
         "Done"
         ]
     

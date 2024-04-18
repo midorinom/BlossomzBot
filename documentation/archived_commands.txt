@@ -28,7 +28,7 @@ async def write_all_to_spreadsheet(ctx: SlashContext):
         await ctx.send("Loading...", ephemeral=True)
         await ctx.delete()
 
-        if config_values['status_automatic_sheet_updates']:
+        if config_values['status_automated_sheet_updates']:
             for member in ctx.guild.members:
                 if not member.bot:
                     total_roles = count_number_of_roles(member)
