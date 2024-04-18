@@ -115,3 +115,20 @@ def sift_out_prev_role(member_before, new_role):
         prev_role = "Friend"
 
     return prev_role
+
+def create_kick_nicely_buttons(username, display_name, member_id):
+    yes_button = Button(
+        style=ButtonStyle.SUCCESS,
+        label="Yes",
+        custom_id=f"kick_nicely_yes_{username}_{display_name}_{member_id}",
+        disabled=False,
+    )
+
+    no_button = Button(
+        style=ButtonStyle.DANGER,
+        label="No",
+        custom_id=f"kick_nicely_no_{username}_{display_name}_{member_id}",
+        disabled=False,
+    )
+
+    return [yes_button, no_button]
