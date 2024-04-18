@@ -56,6 +56,10 @@ async def on_member_update(event: MemberUpdate):
     managing_guests_channel = event.client.get_channel(config_values["managing_guests_channel_id"])
     blossomz_bot_channel = event.client.get_channel(config_values["blossomz_bot_channel_id"])
 
+    # Exclude Admins
+    if after.has_role(config_values["leader_role"]) or after.has_role(config_values["officer_role"]):
+        return
+
     # Check for Multiple Roles
     number_of_roles = count_number_of_roles(after)
     
