@@ -251,7 +251,7 @@ async def configure_select_callback(ctx: ComponentContext):
 
                 await ctx.edit_origin(content=f"The '{feature}' feature is now disabled.\n\n{generate_features_status()}", components=[])
 
-kick_nicely_regex = re.compile(r"kick_nicely_(yes|no)_(\w+)_([0-9]+)_(\w+)")
+kick_nicely_regex = re.compile(r"kick_nicely_(yes|no)_([\w.]+)_([0-9]+)_([\w.]+)")
 @component_callback(kick_nicely_regex)
 async def kick_nicely_callback(ctx: ComponentContext):
     match = kick_nicely_regex.match(ctx.custom_id)
@@ -282,7 +282,7 @@ async def kick_nicely_callback(ctx: ComponentContext):
                 await ctx.defer(edit_origin=True)
                 await ctx.delete(ctx.message)
 
-send_welcome_message_regex = re.compile(r"send_welcome_message_(yes|no)_(\w+)_([0-9]+)_(\w+)")
+send_welcome_message_regex = re.compile(r"send_welcome_message_(yes|no)_([\w.]+)_([0-9]+)_([\w.]+)")
 @component_callback(send_welcome_message_regex)
 async def send_welcome_message_callback(ctx: ComponentContext):
     match = send_welcome_message_regex.match(ctx.custom_id)
