@@ -79,6 +79,7 @@ Instead of using SheetDB's API to perform updates on the google sheet, everytime
 <a name="Commands"></a>
 #### Slash Commands
 Only the admins are allowed to use these commands. These are the slash commands created that are currently in service within the Blossomz discord server:
+
 <img src="/documentation/README/Commands.png" alt="Commands" title="Commands">
 
 (1) Configure
