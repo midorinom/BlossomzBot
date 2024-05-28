@@ -65,7 +65,9 @@ When a new guest has joined and has their role changed to either Member or Best 
 
 <a name="Google"></a>
 #### Google Sheets Integration
-As there are many members in the discord server, with some being members ingame in Lost Ark, some being non-members ingame but are active in the community, some being friends of the members, some being mere guests, there are a lot of people to manage. For convenient administration, it is helpful to keep track of the information of every person in the discord server inside a spreadsheet in google sheets that the Blossomz admins can all access. However, it will be a lot of manual work to maintain the spreadsheet whenever there is a new member or when existing discord server members are updated in some way. BlossomzBot solves this problem by automating much of these aforementioned problems, by automatically updating the google sheet whenever there is a new member in the discord server, when someone changes their display name or discord username, or has their role changed by an admin. 
+As there are many members in the discord server, with some being members ingame in Lost Ark, some being non-members ingame but are active in the community, some being friends of the members, some being mere guests, there are a lot of people to manage. For convenient administration, it is helpful to keep track of the information of every person in the discord server inside a spreadsheet in google sheets that the Blossomz admins can all access. 
+
+However, it will be a lot of manual work to maintain the spreadsheet whenever there is a new member or when existing discord server members are updated in some way. BlossomzBot solves this problem by automating much of these aforementioned problems, by automatically updating the google sheet whenever there is a new member in the discord server, when someone changes their display name or discord username, or has their role changed by an admin. 
 
 The spreadsheet looks like this:
 
