@@ -87,6 +87,7 @@ Only the admins are allowed to use these commands. These are the slash commands 
 <img src="/documentation/README/Commands.png" alt="Commands" title="Commands">
 
 (1) Configure
+
 The configure command allows for enabling and disabling various BlossomzBot features, in the event that any of them are defective or causing problems, they can be disabled individually while the rest of the app can still continue running and working. This is what you see upon using the command: 
 
 <img src="/documentation/README/Configure.png" alt="Configure" title="Configure">
@@ -96,15 +97,19 @@ These are the options for the dropdown:
 <img src="/documentation/README/Configure Options.png" alt="Configure Options" title="Configure Options">
 
 (2) Kick Nicely
+
 This allows admins to kick a member from the discord server, with the bot sending them a private personal message to explain the reason why they were kicked and also assuring them that they would be welcomed back if they wish to join back again. The message looks like this: 
 
 <img src="/documentation/README/Kick Message.png" alt="Kick Message" title="Kick Message">
 
 (3) Send Welcome Message
+
 Allows admins to manually make BlossomzBot send a welcome message to a user by inputting a User ID. This command can be used in the event that a welcome message needs to be sent but was for some reason not able to be sent via the normal automated means.
 
 (4) Insert All Member IDs (Archived, can be found <a href="/documentation/archived_commands.txt">here</a>)
+
 Runs a script that loops through all the Member ID of everyone in the discord server and inserts them into the database if the Member ID does not already exist. This command was used at the very start when BlossomzBot was initially deployed, as the database was empty and not yet seeded with all the Member IDs of the existing members in the discord server. After this was done once, the command was no longer needed.
 
 (5) Write All to Spreadsheet (Archived, can be found <a href="/documentation/archived_commands.txt">here</a>)
+
 Runs a script that loops through everyone in the discord server and inserts their relevant information into the google sheet. This command was used at the very start when BlossomzBot was initially deployed, as the google sheet was empty and not yet seeded with all the data of the existing members in the discord server. After this was done once, the command was no longer needed.
