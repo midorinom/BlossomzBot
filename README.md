@@ -30,7 +30,9 @@ The app is integrated with Google Sheets by making API calls to API endpoints cr
 
 <a name="DevEnvironment"></a>
 ## Development Environment
-There are 2 Git Branches, the main branch contains the code with the most updated version of the app and is the version that is hosted in AWS and used in the Blossomz discord server at all times. The dev branch is used for the purposes of developing new features and expanding the app. When developing the app, only the dev branch is used for new commits, the changes are tested locally inside a development discord server that I created myself, as well as a local instance of MySql and local .env files to contain relevant configuration information. An alt account is also used for SheetDB API testing so as to avoid unnecessarily making API calls for the main SheetDB account that is used by the Blossomz discord server, due to the free tier of SheetDB having a monthly limit of API requests that can be made.
+There are 2 Git Branches, the main branch contains the code with the most updated version of the app and is the version that is hosted in AWS and used in the Blossomz discord server at all times. The dev branch is used for the purposes of developing new features and expanding the app. 
+
+When developing the app, only the dev branch is used for new commits, the changes are tested locally inside a development discord server that I created myself, as well as a local instance of MySql and local .env files to contain relevant configuration information. An alt account is also used for SheetDB API testing so as to avoid unnecessarily making API calls for the main SheetDB account that is used by the Blossomz discord server, due to the free tier of SheetDB having a monthly limit of API requests that can be made.
 
 Whenever a new feature has been finished and is ready for deployment, I complete a pull request from the dev branch to the main branch. Github Actions is then triggered upon any changes being made to the main branch, running the deploy.yml script which deploys the new code into the AWS EC2 server where the app is hosted. 
 
