@@ -18,6 +18,8 @@ This discord bot is created to be used by the admins of the Blossomz discord ser
 
 <a name="Technologies"></a>
 ## Technologies Used
+Architecture Diagram:
+
 <img src="/documentation/README/Architecture Diagram.png" alt="Architecture Diagram" title="Architecture Diagram">
 
 The app was built using Python and the Interactions.py library. It is connected to a MySQL database. 
