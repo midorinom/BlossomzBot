@@ -115,11 +115,11 @@ Allows admins to manually make BlossomzBot send a welcome message to a user by i
 
 (4) Insert All Member IDs (Archived, can be found <a href="/documentation/archived_commands.txt">here</a>)
 
-Runs a script that loops through all the Member ID of everyone in the discord server and inserts them into the database if the Member ID does not already exist. This command was used at the very start when BlossomzBot was initially deployed, as the database was empty and not yet seeded with all the Member IDs of the existing members in the discord server. After this was done once, the command was no longer needed.
+Runs a script that loops through all the Member ID of everyone in the discord server and inserts them into the database if the Member ID does not already exist. This command was used at the very start when BlossomzBot was initially deployed, as the database was empty and not yet seeded with all the Member IDs of the existing members in the discord server. After this was done once, the command was archived as it is no longer needed.
 
 (5) Write All to Spreadsheet (Archived, can be found <a href="/documentation/archived_commands.txt">here</a>)
 
-Runs a script that loops through everyone in the discord server and inserts their relevant information into the google sheet. This command was used at the very start when BlossomzBot was initially deployed, as the google sheet was empty and not yet seeded with all the data of the existing members in the discord server. After this was done once, the command was no longer needed.
+Runs a script that loops through everyone in the discord server and inserts their relevant information into the google sheet. This command was used at the very start when BlossomzBot was initially deployed, as the google sheet was empty and not yet seeded with all the data of the existing members in the discord server. After this was done once, the command was archived as it is no longer needed.
 
 <a name="Error"></a>
 #### Error Handling
