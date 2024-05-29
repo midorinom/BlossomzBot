@@ -9,6 +9,7 @@
     * [Welcome Message](#Welcome)
     * [Google Sheets Integration](#Google)
     * [Slash Commands](#Commands)
+ * [Error Handling](#Error)
 
 <a name="Introduction"></a>
 ## Introduction
@@ -119,3 +120,7 @@ Runs a script that loops through all the Member ID of everyone in the discord se
 (5) Write All to Spreadsheet (Archived, can be found <a href="/documentation/archived_commands.txt">here</a>)
 
 Runs a script that loops through everyone in the discord server and inserts their relevant information into the google sheet. This command was used at the very start when BlossomzBot was initially deployed, as the google sheet was empty and not yet seeded with all the data of the existing members in the discord server. After this was done once, the command was no longer needed.
+
+<a name="Error"></a>
+#### Error Handling
+Errors detected in all try / except blocks are logged as a message by the bot into the blossomz-bot channel in the discord server. These error messages are specific to which function was being executed to allow for easier troubleshooting, with all error messages being defined inside <a href="/models/Messages.py">here</a>. If errors are caught from try / except blocks inside inner functions, the error is raised back up to the outer functions where the outer try / except blocks will make the bot to log the error in the discord server. 
