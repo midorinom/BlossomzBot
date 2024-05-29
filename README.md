@@ -88,7 +88,7 @@ To read from the Holding Area tab and perform all the relevant operations to upd
 <img src="/documentation/README/Name Change.png" alt="Name Change" title="Name Change">
 
 The following diagram summarises the flow of this entire process:
-<img src="/documentation/README/Sequence Diagram.png" alt="Sequence Diagram" title="Sequence Diagram">
+<img src="/documentation/README/Flow Diagram.png" alt="Flow Diagram" title="Flow Diagram">
 
 <a name="Commands"></a>
 #### Slash Commands
