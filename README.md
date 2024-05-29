@@ -82,10 +82,13 @@ To make changes to the spreadsheet from the discord app, I make use of the Sheet
 
 Instead of using SheetDB's API to perform updates on the google sheet, whenever a new person is to be added or updated in the sheet, the discord app sends all the relevant information to the Holding Area. If there is no previous role, that means it is a new person and they are to be added. If there is a previous role and new role, that means it is an existing person and their role is to be updated, meaning the row containing their information have to be removed from a tab and then added to a different tab. If the previous role and new role are the same, it means that either their display name or discord username have changed, so their will simply just have to be updated within the same tab and same row. 
 
-To read from the Holding Area tab and perform all the relevant operations to update the google sheet, I make use of Google Apps Script. The script that I wrote in App Script can be found <a href="/documentation/appScript.js">here</a>. The Apps Script is triggered automatically whenever a new entry is added to the Holding Area tab and it will perform the logic as I have described, to assess how to update the sheet accordingly. This is how the resulting logs look like inside the #blossomz-bot channel whenever someone's role, display name or discord username has been updated:
+To read from the Holding Area tab and perform all the relevant operations to update the google sheet, I make use of Google Apps Script. The script that I wrote in App Script can be found <a href="/documentation/appScript.js">here</a>. The Apps Script is triggered automatically whenever a new entry is added to the Holding Area tab and it will perform the logic as I have described, to assess how to update the sheet accordingly. After the sheets have been updated, App Script sends a success message back to BlossomzBot, they are being connected via a weboook. The bot then logs the success message inside the #blossomz-bot channel. This is how the resulting logs look like whenever someone's role, display name or discord username has been updated:
 
 <img src="/documentation/README/Role Change.png" alt="Role Change" title="Role Change">
 <img src="/documentation/README/Name Change.png" alt="Name Change" title="Name Change">
+
+The following diagram summarises the flow of this entire process:
+<img src="/documentation/README/Sequence Diagram.png" alt="Sequence Diagram" title="Sequence Diagram">
 
 <a name="Commands"></a>
 #### Slash Commands
