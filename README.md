@@ -15,7 +15,7 @@
 ## Introduction
 BlossomzBot is a bot created for Discord, a social platform for messaging and making calls. In particular, BlossomzBot was created entirely by myself for a discord server (Blossomz) that I am a part of, which is a community within the online multiplayer game, Lost Ark. 
 
-This discord bot is created to be used by the admins of the Blossomz discord server, to make the process of carrying out various server and ingame administrative matters much easier and automated.
+This discord bot was created to be used by the admins of the Blossomz discord server, to make the process of carrying out various server and ingame administrative matters much easier and automated.
 
 <a name="Technologies"></a>
 ## Technologies Used
@@ -62,7 +62,7 @@ The welcome message and google sheets features will be explained below.
 
 <a name="Welcome"></a>
 #### Welcome Message
-When a new guest has joined and has their role changed to either Member or Best Friend, it means that they joined with the intention to be actively involved in the Blossomz community. In this case, a welcome message will be automically sent by the bot to that person's direct messages inbox as a private personal message. This will hopefully make the person feel welcomed into the community, the message looks like so:
+When a new guest has joined and has their role changed to either Member or Best Friend, it means that they joined with the intention to be actively involved in the Blossomz community. In this case, a welcome message will be automatically sent by the bot to that person's direct messages inbox as a private personal message. This will hopefully make the person feel welcomed into the community, the message looks like so:
 
 <img src="/documentation/README/Welcome Message.png" alt="Welcome Message" title="Welcome Message">
 
@@ -76,11 +76,11 @@ The spreadsheet looks like this:
 
 <img src="/documentation/README/Google Sheet.png" alt="Google Sheet" title="Google Sheet">
 
-To make changes to the spreadsheet from the discord app, I make use of the SheetDB API which is a service that allows for easy communication with Google Sheets. However, with the free tier of SheetDB, there is a limited amount of API calls that can be made per month. Some changes made in the discord server would require multiple updates to be made in the sheets, for example changing a person's role would require first searching the spreadsheet for the tab with the role that person previously had, then searching through the sheet to find the row containing that person, delete that row, then searching for the tab for the new role that the person is given, then adding that row again. To fulfil even one use case can require many many API calls to update the sheet as required. To get around this problem, I created this Holding Area tab in the sheet:
+To make changes to the spreadsheet from the discord app, I make use of the SheetDB API which is a service that allows for easy communication with Google Sheets. However, with the free tier of SheetDB, there is a limited amount of API calls that can be made per month. Some changes made in the discord server would require multiple updates to be made in the sheets, for example changing a person's role would require first searching the spreadsheet for the tab with the role that person previously had, then searching through the sheet to find the row containing that person, delete that row, then searching for the tab for the new role that the person is given, then adding that row again. To fulfil even one use case can require many API calls to update the sheet as required. To get around this problem, I created this Holding Area tab in the sheet:
 
 <img src="/documentation/README/Holding Area.png" alt="Holding Area" title="Holding Area">
 
-Instead of using SheetDB's API to perform updates on the google sheet, everytime a new person is to be added or updated in the sheet, the discord app sends all the relevant information to the Holding Area. If there is no previous role, that means it is a new person and they are to be added. If there is a previous role and new role, that means it is an existing person and their role is to be updated, meaning the row containing their information have to be removed from a tab and then added to a different tab. If previous role and new role are the same, it means that either their display name or discord username have changed, so their will simply just have to be updated within the same tab and same row. 
+Instead of using SheetDB's API to perform updates on the google sheet, whenever a new person is to be added or updated in the sheet, the discord app sends all the relevant information to the Holding Area. If there is no previous role, that means it is a new person and they are to be added. If there is a previous role and new role, that means it is an existing person and their role is to be updated, meaning the row containing their information have to be removed from a tab and then added to a different tab. If the previous role and new role are the same, it means that either their display name or discord username have changed, so their will simply just have to be updated within the same tab and same row. 
 
 To read from the Holding Area tab and perform all the relevant operations to update the google sheet, I make use of Google Apps Script. The script that I wrote in App Script can be found <a href="/documentation/appScript.js">here</a>. The Apps Script is triggered automatically whenever a new entry is added to the Holding Area tab and it will perform the logic as I have described, to assess how to update the sheet accordingly. This is how the resulting logs look like inside the #blossomz-bot channel whenever someone's role, display name or discord username has been updated:
 
