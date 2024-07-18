@@ -15,7 +15,7 @@
 ## Introduction
 BlossomzBot is a bot created for Discord, a social platform for messaging and making calls. In particular, BlossomzBot was created entirely by myself for a discord server (Blossomz) that I am a part of, which is a community within the online multiplayer game, Lost Ark. 
 
-This discord bot was created to be used by the admins of the Blossomz discord server, to make the process of carrying out various server and ingame administrative matters much easier and automated.
+This discord bot was created to be used by the admins of the Blossomz discord server, to make the process of carrying out various server and in-game administrative matters much easier and automated.
 
 ## Technologies Used
 <a name="Technologies"></a>
