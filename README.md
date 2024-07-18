@@ -17,9 +17,25 @@ BlossomzBot is a bot created for Discord, a social platform for messaging and ma
 
 This discord bot was created to be used by the admins of the Blossomz discord server, to make the process of carrying out various server and ingame administrative matters much easier and automated.
 
-<a name="Technologies"></a>
 ## Technologies Used
-Architecture Diagram:
+<a name="Technologies"></a>
+<div style="display:flex">
+<img src="/readme/Python.png" alt="Python" title="Python">
+<img src="/readme/Interactions.py.png" alt="Interactions.py" title="Interactions.py">
+<img src="/readme/Discord Dev.png" alt="Discord Dev" title="Discord Dev">
+<img src="/readme/AWS EC2.png" alt="AWS EC2" title="AWS EC2">
+<img src="/readme/AWS RDS.png" alt="AWS RDS" title="AWS RDS">
+</div>
+
+<div style="display:flex">
+<img src="/readme/MySQL.png" alt="MySQL" title="MySQL">
+<img src="/readme/Google Sheets.png" alt="Google Sheets" title="Google Sheets">
+<img src="/readme/Apps Script.png" alt="Apps Script" title="Apps Script">
+<img src="/readme/SheetDB.png" alt="SheetDB" title="SheetDB">
+<img src="/readme/GitHub Actions.png" alt="GitHub Actions" title="GitHub Actions">
+</div>
+
+#### Architecture Diagram
 
 <img src="/documentation/README/Architecture Diagram.png" alt="Architecture Diagram" title="Architecture Diagram">
 
