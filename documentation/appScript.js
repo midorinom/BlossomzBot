@@ -6,8 +6,8 @@ function onChange(e) {
     
     const holdingAreaSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Holding Area");
     let holdingAreaData = holdingAreaSheet.getDataRange().getValues();
-    const discordUrl = "https://discord.com/api/webhooks/1230173537063403540/Y9udtgvGj8mDQ-0CAueR0QDdbZKiXyMvtS3Twwc28tICTsF8PKkPvjl-R-R3i38CPavW"; // Blossomz
-    // const discordUrl = "https://discord.com/api/webhooks/1230151929934385254/3HkSB0L4pyNmOOYh0SnZGP3H6DjaoIssS2moe4C0upXZpzaASH-dV8XgCxK1Vs1GsPkq"; // Dev Server
+    const discordUrl = "https://discord.com/api/webhooks/SECRET"; // Blossomz
+    // const discordUrl = "https://discord.com/api/webhooks/SECRET"; // Dev Server
     var discordMessage = "";
   
     // Column Numbers
