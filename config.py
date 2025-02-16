@@ -10,8 +10,8 @@ config_values = {
     "blossomz_bot_channel_id": 1228048470888288377,
 
     # Sheetdb Endpoint URL
-    "sheetdb_url": "https://sheetdb.io/api/v1/nsfxy76woarwz",
-    "sheetdb_alt_url": "https://sheetdb.io/api/v1/jf9lchfs84f9f",
+    "sheetdb_url": "https://sheetdb.io/api/v1/SECRET",
+    "sheetdb_alt_url": "https://sheetdb.io/api/v1/SECRET",
 
     # Status of Bot Features
     "status_managing_guests": True,
@@ -32,8 +32,8 @@ config_values = {
 #     "blossomz_bot_channel_id": 1228048206701793421,
 
 #     # Sheetdb Endpoint URL
-#     "sheetdb_url": "https://sheetdb.io/api/v1/6jzpg5xa5r23n",
-#     "sheetdb_alt_url": "https://sheetdb.io/api/v1/6jzpg5xa5r23n",
+#     "sheetdb_url": "https://sheetdb.io/api/v1/SECRET",
+#     "sheetdb_alt_url": "https://sheetdb.io/api/v1/SECRET",
 
 #     # Status of Bot Features
 #     "status_managing_guests": True,
